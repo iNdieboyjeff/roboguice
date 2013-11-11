@@ -15,7 +15,7 @@ public abstract class AndroidCallable<ResultT> implements AndroidCallableI<Resul
      * Do not call this directly, pass this AndroidCallable to an Executor and this
      * your doInBackground method will be executed in the background thread.
      */
-    @Override
+
     public void run() {
         new AndroidCallableWrapper<ResultT>(null,this, creationLocation).run();
     }
@@ -23,12 +23,12 @@ public abstract class AndroidCallable<ResultT> implements AndroidCallableI<Resul
     /**
      * {@inheritDoc}
      */
-    @Override
+
     public void onPreCall() throws Exception {}
 
     /**
      * {@inheritDoc}
      */
-    @Override
+
     public void onFinally() {}
 }

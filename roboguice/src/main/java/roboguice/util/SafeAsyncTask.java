@@ -155,12 +155,12 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
 
 
     public class SafeAsyncTaskAndroidCallable extends AndroidCallable<ResultT> {
-        @Override
+       
         public ResultT doInBackground() throws Exception {
             return call();
         }
 
-        @Override
+        
         public void onException(Exception e) {
             SafeAsyncTask.this.onException(e);
         }
@@ -179,7 +179,7 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
             }
         }
 
-        @Override
+      
         public void onSuccess(ResultT result) {
             try {
                 SafeAsyncTask.this.onSuccess(result);

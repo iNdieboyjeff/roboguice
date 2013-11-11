@@ -26,7 +26,6 @@ public class AndroidCallableWrapper<ResultT> implements Runnable {
         this.handler = handler != null ? handler : new Handler(Looper.getMainLooper());
     }
 
-    @Override
     public void run() {
         ResultT result = null;
         Exception exception = null;
@@ -55,7 +54,6 @@ public class AndroidCallableWrapper<ResultT> implements Runnable {
             public void run() {
                 try {
                     new Callable() {
-                        @Override
                         public Object call() throws Exception {
                             doOnPreCall();
                             return null;
@@ -79,7 +77,6 @@ public class AndroidCallableWrapper<ResultT> implements Runnable {
 
     void afterCall(final ResultT result, final Exception e) {
         handler.post(new Runnable() {
-            @Override
             public void run() {
                 try {
                     if (e != null) {

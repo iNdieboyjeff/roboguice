@@ -27,7 +27,7 @@ public class ContextScopedRoboInjector implements RoboInjector {
         this.scope = delegate.getInstance(ContextScope.class);
     }
 
-    @Override
+
     public Injector createChildInjector(Iterable<? extends Module> modules) {
         synchronized (ContextScope.class) {
             scope.enter(context);
@@ -39,7 +39,7 @@ public class ContextScopedRoboInjector implements RoboInjector {
         }
     }
 
-    @Override
+
     public Injector createChildInjector(Module... modules) {
         synchronized (ContextScope.class) {
             scope.enter(context);
@@ -51,7 +51,7 @@ public class ContextScopedRoboInjector implements RoboInjector {
         }
     }
 
-    @Override
+
     public <T> List<Binding<T>> findBindingsByType(TypeLiteral<T> type) {
         synchronized (ContextScope.class) {
             scope.enter(context);

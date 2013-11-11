@@ -83,7 +83,7 @@ public abstract class RoboIntentService extends IntentService implements RoboCon
         eventManager.fire(new OnConfigurationChangedEvent<Service>(this,currentConfig,newConfig) );
     }
 
-    @Override
+
     public Map<Key<?>, Object> getScopedObjectMap() {
         return scopedObjects;
     }

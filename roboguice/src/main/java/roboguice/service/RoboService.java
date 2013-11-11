@@ -85,7 +85,7 @@ public abstract class RoboService extends Service implements RoboContext {
         eventManager.fire(new OnConfigurationChangedEvent<Service>(this,currentConfig, newConfig) );
     }
 
-    @Override
+
     public Map<Key<?>, Object> getScopedObjectMap() {
         return scopedObjects;
     }
