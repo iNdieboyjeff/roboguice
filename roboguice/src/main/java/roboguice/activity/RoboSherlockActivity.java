@@ -15,14 +15,8 @@
  */
 package roboguice.activity;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.os.Bundle;
-
-import com.actionbarsherlock.app.SherlockActivity;
-import com.google.inject.Inject;
-import com.google.inject.Key;
+import java.util.HashMap;
+import java.util.Map;
 
 import roboguice.RoboGuice;
 import roboguice.activity.event.OnActivityResultEvent;
@@ -41,8 +35,18 @@ import roboguice.inject.ContentViewListener;
 import roboguice.inject.RoboInjector;
 import roboguice.util.RoboContext;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.actionbarsherlock.app.SherlockActivity;
+
+import com.google.inject.Inject;
+import com.google.inject.Key;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.util.AttributeSet;
+import android.view.View;
 
 /**
  * @author Roberto Tyley
@@ -139,4 +143,22 @@ public class RoboSherlockActivity extends SherlockActivity implements RoboContex
     public Map<Key<?>, Object> getScopedObjectMap() {
         return scopedObjects;
     }
+
+    @Override
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+        if (RoboActivity.shouldInjectOnCreateView(name))
+            return RoboActivity.injectOnCreateView(name, context, attrs);
+
+        return super.onCreateView(name, context, attrs);
+    }
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        if (RoboActivity.shouldInjectOnCreateView(name))
+            return RoboActivity.injectOnCreateView(name, context, attrs);
+
+        return super.onCreateView(parent, name, context, attrs);
+    }
+
+
 }

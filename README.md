@@ -128,5 +128,16 @@ It works, and people are using it. Why not give it a spin?
         <td width="72" align="center">
             <a title="Bento" href="https://play.google.com/store/apps/details?id=br.gov.rs.bentogoncalves.guia" rel="nofollow"><img src="http://donnfelker.github.com/roboguice/images/app-icons/bento.png" width="72" height="72"></a>Bento
         </td>
+		<td width="72" align="center">
+		    <a title="Gymglish" href="https://play.google.com/store/apps/details?id=com.gymglish.ggmobile" rel="nofollow"><img src="https://lh5.ggpht.com/2zBbA4WgY_yZ2HBSPuvbeuva0-NDDHBQLdjcomlyQ4zhpUIgcrDpoP7Z5YEI1if1Dg=w300-rw" width="72" height="72"></a>Gymglish
+		</td>
     </tr>
 </table>
+
+
+<p>
+YourKit is kindly supporting Roboguice open source project with its full-featured Java Profiler.
+YourKit, LLC is the creator of innovative and intelligent tools for profiling
+Java and .NET applications. Take a look at YourKit's leading software products:
+<a href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a> and
+<a href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>.

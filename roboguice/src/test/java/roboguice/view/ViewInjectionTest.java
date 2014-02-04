@@ -1,26 +1,30 @@
 package roboguice.view;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.LinearLayout;
-import com.google.inject.Inject;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
+
+import java.lang.ref.SoftReference;
+import java.util.ArrayList;
+
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.util.ActivityController;
+
 import roboguice.RoboGuice;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
 
-import java.lang.ref.SoftReference;
-import java.util.ArrayList;
+import com.google.inject.Inject;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import android.content.Context;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
 
 @RunWith(RobolectricTestRunner.class)
 public class ViewInjectionTest {
@@ -51,19 +55,26 @@ public class ViewInjectionTest {
         assertThat(activityRef.get().v, not(equalTo(null)));
 
         controller.destroy();
+        //noinspection UnusedAssignment
         controller=null;
+
 
         // Force an OoM
         // http://stackoverflow.com/questions/3785713/how-to-make-the-java-system-release-soft-references/3810234
+        boolean oomHappened = false;
         try {
             @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"}) final ArrayList<Object[]> allocations = new ArrayList<Object[]>();
-            //noinspection InfiniteLoopStatement
-            while(true)
-                allocations.add( new Object[(int) Runtime.getRuntime().maxMemory()] );
+            int size;
+            while( (size = Math.min(Math.abs((int)Runtime.getRuntime().freeMemory()),Integer.MAX_VALUE))>0 )
+                allocations.add( new Object[size] );
+
         } catch( OutOfMemoryError e ) {
             // great!
+            oomHappened = true;
         }
 
+
+        Assert.assertTrue(oomHappened);
         assertThat(activityRef.get(), equalTo(null));
 
     }
@@ -110,7 +121,7 @@ public class ViewInjectionTest {
             setContentView(ref);
         }
 
-        
+
         public static class PojoA {
             @InjectView(100) View v;
         }
@@ -121,7 +132,7 @@ public class ViewInjectionTest {
 
     public static class C extends RoboActivity {
         @InjectView(100) ViewA v;
-        
+
         LinearLayout ref;
 
         @Override

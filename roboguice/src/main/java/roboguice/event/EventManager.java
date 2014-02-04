@@ -1,15 +1,20 @@
 package roboguice.event;
 
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import roboguice.event.eventListener.ObserverMethodListener;
 import roboguice.inject.ContextSingleton;
 
-import android.content.Context;
-
 import com.google.inject.Inject;
 
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.Map.Entry;
+import android.content.Context;
 
 /**
  * Manager class handling the following:
@@ -20,7 +25,6 @@ import java.util.Map.Entry;
  *      clear()
  *   Raising Events:
  *      fire()
- *      notifyWithResult()
  *
  * @author Adam Tybor
  * @author John Ericksen
@@ -123,16 +127,21 @@ public class EventManager {
         final Set<EventListener<?>> observers = registrations.get(event.getClass());
         if (observers == null) return;
 
+        for (EventListener observer : copyObservers(observers))
+            //noinspection unchecked
+            observer.onEvent(event);
+
+    }
+
+    protected Set<EventListener<?>> copyObservers(Set<EventListener<?>> observers) {
         // As documented in http://docs.oracle.com/javase/1.4.2/docs/api/java/util/Collections.html#synchronizedSet(java.util.Set)
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (observers) {
-            for (EventListener observer : observers)
-                observer.onEvent(event);
+            return new LinkedHashSet<EventListener<?>>(observers);
         }
-
     }
-    
-    
+
+
     public void destroy() {
         for( Entry<Class<?>, Set<EventListener<?>>> e : registrations.entrySet() )
             e.getValue().clear();
@@ -140,3 +149,4 @@ public class EventManager {
     }
 
 }
+

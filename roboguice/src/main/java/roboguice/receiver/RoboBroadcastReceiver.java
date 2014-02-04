@@ -7,8 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.google.inject.Injector;
-
 /**
  * To ensure proper ContextScope usage, override the handleReceive method
  */
@@ -21,9 +19,7 @@ public abstract class RoboBroadcastReceiver extends BroadcastReceiver {
      */
     @Override
     public final void onReceive(Context context, Intent intent) {
-        final Injector injector = RoboGuice.getBaseApplicationInjector((Application) context.getApplicationContext());
-
-        injector.injectMembers(this);
+        RoboGuice.getBaseApplicationInjector((Application) context.getApplicationContext()).injectMembers(this);
         handleReceive(context, intent);
     }
 

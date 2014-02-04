@@ -14,6 +14,7 @@ import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.Vibrator;
@@ -23,16 +24,19 @@ import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
+
 import roboguice.activity.RoboActivity;
 import roboguice.event.EventManager;
 import roboguice.event.ObservesTypeListener;
 import roboguice.event.eventListener.factory.EventListenerThreadingDecorator;
+import roboguice.fragment.FragmentUtil;
 import roboguice.inject.*;
 import roboguice.service.RoboService;
 import roboguice.util.Ln;
@@ -56,24 +60,19 @@ import roboguice.util.Strings;
  *
  * @author Mike Burton
  */
+@SuppressWarnings("PMD")
 public class DefaultRoboModule extends AbstractModule {
-    protected static final Class fragmentManagerClass;
-    protected static final Class accountManagerClass;
+    public static final String GLOBAL_EVENT_MANAGER_NAME = "GlobalEventManager";
+
+    @SuppressWarnings("rawtypes")
+    protected static final Class ACCOUNT_MANAGER_CLASS;
 
     static {
-        Class c = null;
-        try {
-            c = Class.forName("android.support.v4.app.FragmentManager");
-        } catch( Throwable ignored ) {}
-        fragmentManagerClass = c;
-    }
-
-    static {
-        Class c = null;
+        Class<?> c = null;
         try {
             c = Class.forName("android.accounts.AccountManager");
         } catch( Throwable ignored ) {}
-        accountManagerClass = c;
+        ACCOUNT_MANAGER_CLASS = c;
     }
 
 
@@ -100,7 +99,7 @@ public class DefaultRoboModule extends AbstractModule {
 
         final Provider<Context> contextProvider = getProvider(Context.class);
         final ExtrasListener extrasListener = new ExtrasListener(contextProvider);
-        final PreferenceListener preferenceListener = new PreferenceListener(contextProvider,application,contextScope);
+        final PreferenceListener preferenceListener = new PreferenceListener(contextProvider,application);
         final EventListenerThreadingDecorator observerThreadingDecorator = new EventListenerThreadingDecorator();
 
         // Package Info
@@ -127,6 +126,7 @@ public class DefaultRoboModule extends AbstractModule {
         // Singletons
         bind(ViewListener.class).toInstance(viewListener);
         bind(PreferenceListener.class).toInstance(preferenceListener);
+        bind(EventManager.class).annotatedWith(Names.named(GLOBAL_EVENT_MANAGER_NAME)).to(EventManager.class).asEagerSingleton();
 
 
 
@@ -134,7 +134,8 @@ public class DefaultRoboModule extends AbstractModule {
         bindScope(ContextSingleton.class, contextScope);
         bind(ContextScope.class).toInstance(contextScope);
         bind(AssetManager.class).toProvider(AssetManagerProvider.class);
-        bind(Context.class).toProvider(Key.get(new TypeLiteral<NullProvider<Context>>(){})).in(ContextSingleton.class);
+        bind(Context.class).toProvider(Key.get(new TypeLiteral<NullProvider<Context>>() {
+        })).in(ContextSingleton.class);
         bind(Activity.class).toProvider(Key.get(new TypeLiteral<NullProvider<Activity>>(){})).in(ContextSingleton.class);
         bind(RoboActivity.class).toProvider(Key.get(new TypeLiteral<NullProvider<RoboActivity>>(){})).in(ContextSingleton.class);
         bind(Service.class).toProvider(Key.get(new TypeLiteral<NullProvider<Service>>(){})).in(ContextSingleton.class);
@@ -187,20 +188,23 @@ public class DefaultRoboModule extends AbstractModule {
 
         requestStaticInjection(Ln.class);
 
-        // Compatibility library bindings
-        if(fragmentManagerClass!=null) {
-            //noinspection unchecked
-            bind(fragmentManagerClass).toProvider(FragmentManagerProvider.class);
-        }
-
-
-        // 2.0 Eclair
-        if( VERSION.SDK_INT>=5 ) {
-            //noinspection unchecked
-            bind(accountManagerClass).toProvider(AccountManagerProvider.class);
-        }
-
-
+        bindDynamicBindings();
     }
 
+    @SuppressWarnings("unchecked")
+    private void bindDynamicBindings() {
+        // Compatibility library bindings
+        if(FragmentUtil.hasSupport) {
+            bind(FragmentUtil.supportFrag.fragmentManagerType()).toProvider(FragmentUtil.supportFrag.fragmentManagerProviderType());
+        }
+        if(FragmentUtil.hasNative) {
+            bind(FragmentUtil.nativeFrag.fragmentManagerType()).toProvider(FragmentUtil.nativeFrag.fragmentManagerProviderType());
+        }
+
+        // 2.0 Eclair
+        if( VERSION.SDK_INT>=VERSION_CODES.ECLAIR ) {
+            //noinspection unchecked
+            bind(ACCOUNT_MANAGER_CLASS).toProvider(AccountManagerProvider.class);
+        }
+    }
 }

@@ -15,9 +15,18 @@
  */
 package roboguice.activity;
 
-import android.app.Activity;
+import java.util.HashMap;
+import java.util.Map;
+
 import roboguice.RoboGuice;
-import roboguice.activity.event.*;
+import roboguice.activity.event.OnActivityResultEvent;
+import roboguice.activity.event.OnContentChangedEvent;
+import roboguice.activity.event.OnNewIntentEvent;
+import roboguice.activity.event.OnPauseEvent;
+import roboguice.activity.event.OnRestartEvent;
+import roboguice.activity.event.OnResumeEvent;
+import roboguice.activity.event.OnSaveInstanceStateEvent;
+import roboguice.activity.event.OnStopEvent;
 import roboguice.context.event.OnConfigurationChangedEvent;
 import roboguice.context.event.OnCreateEvent;
 import roboguice.context.event.OnDestroyEvent;
@@ -29,17 +38,18 @@ import roboguice.inject.PreferenceListener;
 import roboguice.inject.RoboInjector;
 import roboguice.util.RoboContext;
 
+import com.google.inject.Inject;
+import com.google.inject.Key;
+
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-
-import com.google.inject.Inject;
-import com.google.inject.Key;
-
-import java.util.HashMap;
-import java.util.Map;
+import android.util.AttributeSet;
+import android.view.View;
 
 /**
  * A {@link RoboPreferenceActivity} extends from {@link PreferenceActivity} to provide
@@ -80,6 +90,7 @@ public abstract class RoboPreferenceActivity extends PreferenceActivity implemen
     }
 
     @Override
+    @Deprecated
     public void setPreferenceScreen(PreferenceScreen preferenceScreen) {
         super.setPreferenceScreen(preferenceScreen);
 
@@ -170,5 +181,22 @@ public abstract class RoboPreferenceActivity extends PreferenceActivity implemen
     public Map<Key<?>, Object> getScopedObjectMap() {
         return scopedObjects;
     }
+
+    @Override
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+        if (RoboActivity.shouldInjectOnCreateView(name))
+            return RoboActivity.injectOnCreateView(name, context, attrs);
+
+        return super.onCreateView(name, context, attrs);
+    }
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        if (RoboActivity.shouldInjectOnCreateView(name))
+            return RoboActivity.injectOnCreateView(name, context, attrs);
+
+        return super.onCreateView(parent, name, context, attrs);
+    }
+
 
 }
